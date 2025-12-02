@@ -1,70 +1,139 @@
-# API de Usuários em Spring Boot
+# 📘 Stay Agenda API (Backend)
 
-Uma API RESTful simples para cadastro de usuários (CRUD), desenvolvida com Spring Boot como parte de um estudo inicial.
+API RESTful desenvolvida em Java com Spring Boot para gestão de clínicas de estética e barbearias. Responsável por toda a regra de negócio, segurança, persistência de dados e cálculos financeiros do sistema Stay Agenda.
 
-> 🚧 **Status:** Em Desenvolvimento 🚧
+-----
 
----
+## 🛠️ Tecnologias & Ferramentas
 
-## 💻 Tecnologias Utilizadas
+  * **Linguagem:** Java 21 (JDK 21)
+  * **Framework:** Spring Boot 3.3.0
+  * **Gerenciador de Dependências:** Maven
+  * **Banco de Dados:** MySQL 8 (Produção via Aiven Cloud)
+  * **ORM:** Spring Data JPA / Hibernate
+  * **Segurança:** Spring Security 6 + JWT (Auth0 java-jwt)
+  * **Containerização:** Docker
+  * **Deploy:** Render.com
 
-Este projeto foi construído utilizando as seguintes tecnologias:
+-----
 
-* **Java 21**
-* **Spring Boot** (v3.5.7)
-* **Maven** (Gerenciador de dependências)
-* **Spring Web**: Para criação de endpoints RESTful.
-* **Spring Data JPA**: Para persistência de dados.
-* **MySQL**: Banco de dados para desenvolvimento e testes.
-* **Lombok**: Para reduzir código boilerplate (getters, setters, construtores).
+## 🏛️ Arquitetura e Segurança
 
----
+### Autenticação (JWT)
 
-## 🚀 Como Executar o Projeto
+O sistema utiliza autenticação **Stateless** via JSON Web Tokens.
 
-Siga os passos abaixo para rodar a aplicação localmente.
+1.  **Login:** O usuário envia credenciais para `/api/auth/login`.
+2.  **Token:** A API retorna um token JWT assinado (validade de 2 horas).
+3.  **Acesso:** O token deve ser enviado no Header `Authorization: Bearer <token>` em todas as requisições protegidas.
+
+### Configuração de CORS
+
+A API está configurada para permitir requisições de **qualquer origem** (`*`) durante a fase de piloto, facilitando o acesso via IP local (Mobile) e localhost.
+
+  * **Configuração:** `SecurityConfigurations.java` (Bean `corsConfigurationSource`).
+
+-----
+
+## 🗄️ Modelo de Dados (Entidades)
+
+O banco de dados foi modelado para garantir integridade financeira e rastreabilidade.
+
+### 1\. Núcleo
+
+  * **`UsuariosModel` (`usuarios`)**: Acesso ao sistema (Login, Senha BCrypt, Perfil).
+  * **`EmpresaModel` (`configuracao_empresa`)**: Armazena a identidade do tenant (Nome e Logo em BLOB) para personalização White Label.
+
+### 2\. Cadastros
+
+  * **`ClientesModel`**: Dados pessoais e histórico.
+  * **`CategoriasModel`**: Agrupamento de procedimentos.
+  * **`ProcedimentosModel`**: Serviços e preços base.
+
+### 3\. Financeiro Inteligente
+
+  * **`PromocoesModel`**: Regras de desconto (Fixo ou %). Pode ser global ou específica por procedimento.
+  * **`FormasPagamentoModel`**: Cadastro de meios (Pix, Cartão) com taxa administrativa (%) e flag de repasse ao cliente.
+  * **`PagamentosModel`**: Registra cada transação financeira vinculada a um agendamento, gravando o snapshot da taxa aplicada no momento.
+
+### 4\. Operacional
+
+  * **`AgendamentosModel`**: Entidade central.
+      * Armazena Data, Hora e Status.
+      * **Snapshot Financeiro:** Grava `valorProcedimento` (total), `valorDesconto` e `valorParcial` (sinal) para evitar alterações retroativas se os preços mudarem.
+  * **`MapeamentosModel`**: Histórico visual (Mídia).
+      * Armazena fotos/vídeos em `LONGBLOB`.
+      * Vincula mídia ao Cliente, Procedimento e Agendamento específico.
+
+-----
+
+## 🚀 Como Rodar Localmente
 
 ### Pré-requisitos
 
-* Java JDK 17 (ou superior) instalado.
-* Maven instalado (ou utilize o Maven Wrapper `mvnw`).
-* **Servidor MySQL** instalado e rodando (localmente ou acessível pela rede).
-* Um "schema" (banco de dados) criado no MySQL (o nome deve ser o mesmo configurado no `application.properties`).
-* Um cliente de API (como Postman ou Insomnia) para testar.
+  * Java JDK 21 instalado.
+  * Maven instalado (ou use o `mvnw` incluso).
+  * MySQL rodando localmente (ou acesso ao banco na nuvem).
 
-### Passos
+### 1\. Configurar Banco de Dados
 
-1.  **Clone o repositório:**
-    ```bash
-    git clone [URL_DO_SEU_REPOSITORIO_AQUI]
-    cd minha-api
-    ```
+Abra o arquivo `src/main/resources/application.properties` e configure suas credenciais:
 
-2.  **Verifique a configuração do Banco de Dados:**
-    * Confirme se os dados no arquivo `src/main/resources/application.properties` (`url`, `username`, `password`) estão corretos para a sua instalação local do MySQL.
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/stay_agenda
+spring.datasource.username=seu_usuario
+spring.datasource.password=sua_senha
+```
 
-3.  **Execute a aplicação (via Maven):**
-    ```bash
-    ./mvnw spring-boot:run
-    ```
+### 2\. Executar a Aplicação
 
-4.  **Alternativa (via IDE):**
-    * Importe o projeto como um projeto Maven na sua IDE.
-    * Encontre a classe principal `MinhaApiApplication.java`.
-    * Clique com o botão direito e selecione "Run".
+No terminal, na raiz do projeto:
 
-A aplicação estará disponível em `http://localhost:8080`.
+```bash
+./mvnw spring-boot:run
+```
 
----
+A API estará disponível em: `http://localhost:8080`
 
-## Endpoints da API
+-----
 
-A URL base para todos os endpoints é `http://localhost:8080/api/usuarios`.
+## ☁️ Deploy (Render + Docker)
 
-| Método | Endpoint | Descrição | Exemplo de Body (JSON) |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/` | Cria um novo usuário | `{ "nome", "senha"}` |
-| `GET` | `/` | Lista todos os produtos cadastrados | N/A |
-| `GET` | `/{id}` | Busca um produto específico pelo ID | N/A |
+O projeto inclui um `Dockerfile` configurado para *Multi-stage build*, otimizado para o Render.
 
-*(Endpoints de `PUT` e `DELETE` a serem implementados)*
+### Variáveis de Ambiente (Environment Variables)
+
+Para rodar em produção, configure as seguintes variáveis no painel do Render:
+
+| Variável | Descrição | Exemplo |
+| :--- | :--- | :--- |
+| `DB_URL` | URL JDBC do Banco (Aiven/TiDB) | `jdbc:mysql://host:port/db?ssl-mode=REQUIRED` |
+| `DB_USER` | Usuário do Banco | `avnadmin` |
+| `DB_PASSWORD` | Senha do Banco | `s3nh4-f0rt3` |
+| `JWT_SECRET` | Chave privada para assinatura | `minha-chave-secreta-jwt` |
+| `PORT` | Porta da aplicação | `8080` |
+
+-----
+
+## 📦 Endpoints Principais
+
+### Autenticação
+
+  * `POST /api/auth/login`: Autenticar e receber Token.
+  * `POST /api/auth/register`: Criar novo usuário administrativo.
+
+### Agendamentos
+
+  * `GET /api/agendamentos/filtro?data=YYYY-MM-DD`: Busca agenda do dia (usado no Dashboard).
+  * `POST /api/agendamentos`: Cria novo agendamento (calcula descontos e taxas).
+  * `PUT /api/agendamentos/{id}`: Atualiza dados e recalcula financeiro se necessário.
+
+### Mapeamentos (Mídia)
+
+  * `POST /api/mapeamentos`: Upload de Foto/Vídeo (Multipart File).
+  * `GET /api/mapeamentos/cliente/{id}`: Retorna histórico visual do cliente.
+
+### Configurações
+
+  * `GET /api/empresa`: Retorna dados públicos da empresa (Logo/Nome) para a tela de login.
+  * `POST /api/empresa`: Atualiza identidade visual.
