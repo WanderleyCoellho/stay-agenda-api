@@ -11,7 +11,10 @@ public interface AgendamentosRepository extends JpaRepository<AgendamentosModel,
 
     // O Spring Data cria o SQL sozinho baseado no nome do método
     List<AgendamentosModel> findByData(LocalDate data);
-    
+
     // Opcional: Se quiser ordenar por horário
     List<AgendamentosModel> findByDataOrderByHoraInicialAsc(LocalDate data);
+
+    // Verifica se existe alguém nesse horário que NÃO esteja cancelado
+    boolean existsByDataAndHoraInicialAndStatusNot(LocalDate data, String horaInicial, String statusExcluido);
 }
