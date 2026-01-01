@@ -1,7 +1,7 @@
 package com.projeto.Controllers;
 
 import com.projeto.Models.PromocoesModel;
-import com.projeto.Repository.PromocoesRepository;
+import com.projeto.Repositories.PromocoesRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,13 +12,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/promocoes") 
+@RequestMapping("/api/promocoes")
 public class PromocoesController {
 
     @Autowired
     private PromocoesRepository promocaoRepository;
 
-    
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PromocoesModel criarPromocao(@RequestBody PromocoesModel promocao) {
@@ -39,14 +38,15 @@ public class PromocoesController {
 
         if (promocao.isPresent()) {
             return ResponseEntity.ok(promocao.get());
+        } else {
+            return ResponseEntity.notFound().build();
         }
-        else {
-        return ResponseEntity.notFound().build();}
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PromocoesModel> atualizarPromocao(@PathVariable Long id, @RequestBody PromocoesModel promocaoDetalhes) {
-        
+    public ResponseEntity<PromocoesModel> atualizarPromocao(@PathVariable Long id,
+            @RequestBody PromocoesModel promocaoDetalhes) {
+
         if (!promocaoRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
@@ -54,16 +54,15 @@ public class PromocoesController {
         return ResponseEntity.ok(promocaoRepository.save(promocaoDetalhes));
     }
 
-  
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarPromocao(@PathVariable Long id) {
-        
+
         if (!promocaoRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
 
         promocaoRepository.deleteById(id);
-        
+
         return ResponseEntity.noContent().build();
     }
 }

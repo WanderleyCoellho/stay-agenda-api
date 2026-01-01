@@ -2,8 +2,8 @@ package com.projeto.Controllers;
 
 import com.projeto.Models.AgendamentosModel;
 import com.projeto.Models.PagamentosModel; // <--- Importante
-import com.projeto.Repository.AgendamentosRepository;
-import com.projeto.Repository.FormasPagamentoRepository;
+import com.projeto.Repositories.AgendamentosRepository;
+import com.projeto.Repositories.FormasPagamentoRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

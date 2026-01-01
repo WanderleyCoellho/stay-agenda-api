@@ -1,7 +1,8 @@
 package com.projeto.Controllers;
 
 import com.projeto.Models.EmpresaModel;
-import com.projeto.Repository.EmpresaRepository;
+import com.projeto.Repositories.EmpresaRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,12 +32,11 @@ public class EmpresaController {
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<?> salvarConfig(
             @RequestParam("nome") String nome,
-            @RequestParam(value = "logo", required = false) MultipartFile logo
-    ) {
+            @RequestParam(value = "logo", required = false) MultipartFile logo) {
         try {
             EmpresaModel empresa;
             List<EmpresaModel> lista = repository.findAll();
-            
+
             if (lista.isEmpty()) {
                 empresa = new EmpresaModel(); // Cria novo
             } else {
@@ -44,7 +44,7 @@ public class EmpresaController {
             }
 
             empresa.setNomeEmpresa(nome);
-            
+
             // Só atualiza a logo se o usuário enviou uma nova
             if (logo != null && !logo.isEmpty()) {
                 empresa.setLogo(logo.getBytes());

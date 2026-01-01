@@ -3,7 +3,7 @@ package com.projeto.Controllers;
 import com.projeto.Models.ClientesModel;
 import com.projeto.Models.MapeamentosModel;
 import com.projeto.Models.ProcedimentosModel;
-import com.projeto.Repository.MapeamentosRepository;
+import com.projeto.Repositories.MapeamentosRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,8 +28,8 @@ public class MapeamentosController {
             @RequestParam("descricao") String descricao,
             @RequestParam("clienteId") Long clienteId,
             @RequestParam("procedimentoId") Long procedimentoId,
-            @RequestParam("agendamentoId" ) Long agendamentoId
-            
+            @RequestParam("agendamentoId") Long agendamentoId
+
     ) {
         try {
             MapeamentosModel mapa = new MapeamentosModel();
@@ -60,13 +60,11 @@ public class MapeamentosController {
         }
     }
 
-    
     @GetMapping
     public List<MapeamentosModel> listarMapeamentos() {
         return mapeamentoRepository.findAll();
     }
 
-    
     @GetMapping("/{id}")
     public ResponseEntity<MapeamentosModel> buscarMapeamentoPorId(@PathVariable Long id) {
         Optional<MapeamentosModel> mapeamento = mapeamentoRepository.findById(id);
@@ -74,20 +72,21 @@ public class MapeamentosController {
         if (mapeamento.isPresent()) {
             return ResponseEntity.ok(mapeamento.get());
         }
-        
+
         return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/cliente/{clienteId}")
     public List<MapeamentosModel> listarPorCliente(@PathVariable Long clienteId) {
         List<MapeamentosModel> lista = mapeamentoRepository.findByClientesId(clienteId);
-        
+
         return lista;
     }
-   
+
     @PutMapping("/{id}")
-    public ResponseEntity<MapeamentosModel> atualizarMapeamento(@PathVariable Long id, @RequestBody MapeamentosModel mapeamentoDetalhes) {
-        
+    public ResponseEntity<MapeamentosModel> atualizarMapeamento(@PathVariable Long id,
+            @RequestBody MapeamentosModel mapeamentoDetalhes) {
+
         Optional<MapeamentosModel> mapeamentoOptional = mapeamentoRepository.findById(id);
 
         if (mapeamentoOptional.isEmpty()) {
@@ -95,7 +94,7 @@ public class MapeamentosController {
         }
 
         MapeamentosModel mapeamentoExistente = mapeamentoOptional.get();
-        
+
         mapeamentoExistente.setDescricao(mapeamentoDetalhes.getDescricao());
         mapeamentoExistente.setNomeArquivo(mapeamentoDetalhes.getNomeArquivo());
         mapeamentoExistente.setProcedimentos(mapeamentoDetalhes.getProcedimentos());
@@ -106,16 +105,15 @@ public class MapeamentosController {
         return ResponseEntity.ok(mapeamentoAtualizado);
     }
 
-   
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletarMapeamento(@PathVariable Long id) {
-        
+
         if (!mapeamentoRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
 
         mapeamentoRepository.deleteById(id);
-        
+
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-package com.projeto.Repository;
+package com.projeto.Repositories;
 
 import com.projeto.Models.EstoqueModel;
 import org.springframework.data.jpa.repository.JpaRepository;

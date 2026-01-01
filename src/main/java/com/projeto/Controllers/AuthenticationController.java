@@ -1,7 +1,7 @@
 package com.projeto.Controllers;
 
 import com.projeto.Models.UsuariosModel;
-import com.projeto.Repository.UsuarioRepository;
+import com.projeto.Repositories.UsuarioRepository;
 import com.projeto.dto.LoginDTO;
 import com.projeto.dto.RegisterDTO;
 import com.projeto.dto.LoginResponseDTO;
@@ -26,7 +26,8 @@ public class AuthenticationController {
     @Autowired
     private TokenService tokenService;
 
-    // LOGIN: Retorna <Object> para aceitar tanto LoginResponseDTO quanto String de erro
+    // LOGIN: Retorna <Object> para aceitar tanto LoginResponseDTO quanto String de
+    // erro
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginDTO data) {
         try {
@@ -36,11 +37,11 @@ public class AuthenticationController {
             var token = tokenService.generateToken((UsuariosModel) auth.getPrincipal());
 
             return ResponseEntity.ok(new LoginResponseDTO(token));
-            
+
         } catch (org.springframework.security.authentication.BadCredentialsException e) {
-            
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuário ou senha inválidos");
-            
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha inválidos");
+
         } catch (Exception e) {
             System.out.println("❌ ERRO GENÉRICO: " + e.getMessage());
             e.printStackTrace();

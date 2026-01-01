@@ -18,16 +18,20 @@ public class DespesasModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String descricao; // Ex: "Compra Semanal", "Conta de Luz"
+    private String descricao;
 
     private BigDecimal valorTotal;
 
     private LocalDate dataDespesa;
 
-    // Categoria: "MATERIAL", "FIXO" (Aluguel), "PESSOAL", etc.
     private String categoria;
 
-    // Aqui vamos salvar o link do QR Code da nota (para consulta futura)
-    @Column(length = 1000) // Aumentamos o tamanho porque links de nota são grandes
+    @Column(length = 1000)
     private String linkNotaFiscal;
+
+    private String fornecedor;
+
+    private LocalDate dataVencimento;
+
+    private Boolean pago;
 }

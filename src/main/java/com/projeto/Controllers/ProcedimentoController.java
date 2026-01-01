@@ -2,7 +2,8 @@ package com.projeto.Controllers;
 
 import com.projeto.Models.MateriaisModel;
 import com.projeto.Models.ProcedimentosModel;
-import com.projeto.Repository.ProcedimentosRepository;
+import com.projeto.Repositories.ProcedimentosRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

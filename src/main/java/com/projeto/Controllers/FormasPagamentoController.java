@@ -1,7 +1,8 @@
 package com.projeto.Controllers;
 
 import com.projeto.Models.FormasPagamentoModel;
-import com.projeto.Repository.FormasPagamentoRepository;
+import com.projeto.Repositories.FormasPagamentoRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,10 @@ public class FormasPagamentoController {
     public FormasPagamentoModel criar(@RequestBody FormasPagamentoModel forma) {
         return repository.save(forma);
     }
-    
+
     @PutMapping("/{id}")
-    public ResponseEntity<FormasPagamentoModel> atualizar(@PathVariable Long id, @RequestBody FormasPagamentoModel dados) {
+    public ResponseEntity<FormasPagamentoModel> atualizar(@PathVariable Long id,
+            @RequestBody FormasPagamentoModel dados) {
         return repository.findById(id)
                 .map(existente -> {
                     existente.setNome(dados.getNome());

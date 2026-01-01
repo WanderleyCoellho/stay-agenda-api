@@ -1,7 +1,8 @@
 package com.projeto.Controllers;
 
 import com.projeto.Models.EstoqueModel;
-import com.projeto.Repository.EstoqueRepository;
+import com.projeto.Repositories.EstoqueRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
